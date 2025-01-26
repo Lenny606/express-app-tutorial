@@ -4,6 +4,12 @@ const app = express();
 app.use(express.json()); //native parser
 const PORT = process.env.PORT || 3000;
 
+//MW
+const loggingMiddleware = (req, res, next) => {
+    console.log("Request received");
+    next();
+}
+
 
 //GET
 app.get('/api/users/:id?filter=&value=', (req, res) => {
