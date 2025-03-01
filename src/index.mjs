@@ -1,4 +1,6 @@
 import express from 'express';
+import {query, validationResult, body, matchedData, checkSchema} from 'express-validator'
+import {createUserValidation} from "../schemaValidator/schemaValidator.js";
 
 const app = express();
 app.use(express.json()); //native parser
@@ -12,29 +14,43 @@ const loggingMiddleware = (req, res, next) => {
 
 
 //GET
-app.get('/api/users/:id?filter=&value=', (req, res) => {
+app.get('/api/users/:id?filter=&value=',
+    query('filter').isString().notEmpty().isLength({min: 3}).withMessage("Filter validation"),
+    (req, res) => {
 
-    const parsedId = parseInt(req.params.id)
-    const {query: {filter, value}} = req
+        const parsedId = parseInt(req.params.id)
+        const {query: {filter, value}} = req
 
-    //query params validation + filter logic
+        //query params validation + filter logic
+        //validator is attached in req
+        const result = validationResult(req)
+        if (!result.isEmpty()) {
+            return res.status(400).json({errors: result.array()})
+        }
+        if (isNaN(parsedId)) {
+            return res.status(400).send({msg: "Invalid id"})
+        }
+        //find resource
 
+        return response.status(200).send({msg: "test", param: parsedId})
+    })
 
-    if (isNaN(parsedId)) {
-        return res.status(400).send({msg: "Invalid id"})
-    }
-    //find resource
+app.post(
+    '/api/users', checkSchema(createUserValidation),
+    (req, res) => {
+        const {body} = req
+        //logic
 
-    return response.status(200).send({msg: "test", param: parsedId})
-})
+        //validation
+        const result = validationResult(req)
+        if (!result.isEmpty()) {
+            return res.status(400).json({errors: result.array()})
+        }
+        const data = matchedData(req)
 
-app.post('/api/users', (req, res) => {
-
-    const {body} = req
-    //logic
-    const resource = null
-    return response.status(201).send({msg: "test", data: resource})
-})
+        const resource = {}
+        return response.status(201).send({msg: "test", data: resource})
+    })
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
