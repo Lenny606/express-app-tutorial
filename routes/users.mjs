@@ -43,6 +43,11 @@ usersRouter.get('/api/users/:id?filter=&value=',
         const cookie = req.headers.cookie //not parsed from header
         const cookieParsed = req.cookies // parsed with MW
         const cookieSigned = req.signedCookies // parsed with MW cookieParser('secret')
+
+        //session
+        const ses = request.sesion;
+        const sid = request.sesion.id;
+        request.session.visited = true
         response.cookie("id", 12135, {maxAge: 3600})
         return response.status(200).send({msg: "test", param: parsedId})
     })
