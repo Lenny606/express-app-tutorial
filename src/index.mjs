@@ -4,6 +4,7 @@ import {createUserValidation} from "../schemaValidator/schemaValidator.js";
 import cookieParser from "cookie-parser";
 import session from "express-session";
 import routes from "../routes/rootRouter.mjs"
+import { mockUsers } from './data/mockUsers.mjs';
 
 const app = express();
 app.use(express.json()); //native json parser
@@ -18,14 +19,62 @@ app.use(session({
 }))
 
 const PORT = process.env.PORT || 3000;
+const mockUsers = mockUsers;
 
 //MW
 const loggingMiddleware = (req, res, next) => {
     console.log("Request received");
     next();
 }
-app.use(routes)
+app.use( routes)
 
+// Authentication endpoint
+// Validates user credentials and creates a session if valid
+// Request body should contain username and password
+// Returns 401 if credentials are invalid
+// Sets user data in session if authentication successful
+app.post("/api/auth", (req, res) => {
+    const { body: {username, password}} = req;
+    const user = mockUsers.find(user => user.username === username && user.password === password);
+    if (!user) {
+        return res.status(401).json({message: "Invalid credentials"});
+    }
+    req.session.user = user;
+    return res.status(200).send(user)
+})
+
+app.get("/api/auth/status", (req, res) => {
+    const {session: {user}} = req;
+    if (!user) {
+        return res.status(401).json({message: "Unauthorized"});
+    }
+    return res.status(200).send(user);
+})
+
+app.post("/api/cart", (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).json({message: "Unauthorized"});
+    }
+    const {body: {productId, quantity}} = req;
+    const {cart} = req.session
+    if (cart) {
+        cart.push({productId, quantity})
+    } else {
+        req.session.cart = [{productId, quantity}]
+    }
+    return res.status(201).send(req.session.cart)
+})
+app.get("/api/cart", (req, res) => {
+    const {session: {user}} = req;
+    if (!user) {
+        return res.status(401).json({message: "Unauthorized"});
+    }
+    const {session: {cart}} = req;
+    if (!cart) {
+        return res.status(200).json({cart: []})
+    }
+    return res.status(200).json({cart})
+})
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
