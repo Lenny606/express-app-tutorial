@@ -1,10 +1,12 @@
 import express from 'express';
 import {query, validationResult, body, matchedData, checkSchema} from 'express-validator'
 import {createUserValidation} from "../schemaValidator/schemaValidator.js";
+import cookieParser from "cookie-parser";
 import routes from "../routes/rootRouter.mjs"
 
 const app = express();
-app.use(express.json()); //native parser
+app.use(express.json()); //native json parser
+app.use(cookieParser())
 const PORT = process.env.PORT || 3000;
 
 //MW
