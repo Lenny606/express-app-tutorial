@@ -8,6 +8,8 @@ import {mockUsers} from './data/mockUsers.mjs';
 import passport from 'passport';
 import './strategies/local-strategy.mjs' //import default from file
 import db from './database/db.mjs';
+import MongoStore from "connect-mongo";
+import mongoose from "mongoose";
 
 const app = express();
 app.use(express.json()); //native json parser
@@ -18,7 +20,10 @@ app.use(session({
     resave: false,
     cookie: {
         maxAge: 60000 * 60
-    }
+    },
+    store: MongoStore.create({
+        client: mongoose.connection.getClient(),
+    })
 }))
 
 app.use(passport.initialize());
