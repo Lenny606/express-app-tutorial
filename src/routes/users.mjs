@@ -1,5 +1,5 @@
 import {Router} from 'express'
-import {query, validationResult, body, matchedData, checkSchema} from 'express-validator'
+import {query, validationResult, matchedData, checkSchema} from 'express-validator'
 import {createUserValidation} from "../schemaValidator/schemaValidator.js";
 import {User} from '../schemas/user.schema.js';
 
