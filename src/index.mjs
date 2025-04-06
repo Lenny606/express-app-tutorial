@@ -19,7 +19,6 @@ app.use(session({
 }))
 
 const PORT = process.env.PORT || 3000;
-const mockUsers = mockUsers;
 
 //MW
 const loggingMiddleware = (req, res, next) => {

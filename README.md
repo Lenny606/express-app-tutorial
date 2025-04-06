@@ -2,3 +2,5 @@
 
 ## new packages
 - express-validator
+- passport
+- passport-local
