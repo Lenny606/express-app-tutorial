@@ -105,6 +105,13 @@ app.get("/api/cart", (req, res) => {
     return res.status(200).json({cart})
 })
 
+app.get('/api/auth/discord', passport.authenticate('discord'), (req, res) => {
+        return res.status(200);  // 1st call ,gets CODE and redirects to callback URL
+})
+app.get('/api/auth/discord/callback', passport.authenticate('discord'), (req, res) => {
+        return res.status(200);
+})
+
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 })
