@@ -7,6 +7,7 @@ import routes from "./routes/rootRouter.mjs"
 import {mockUsers} from './data/mockUsers.mjs';
 import passport from 'passport';
 import './strategies/local-strategy.mjs' //import default from file
+import db from './database/db.mjs';
 
 const app = express();
 app.use(express.json()); //native json parser
@@ -49,14 +50,14 @@ app.use(routes)
 
 //AUTH WITH PASSPORT
 app.post("/api/auth", passport.authenticate('local'), (req, res) => {
-        res.status(200);
+    res.status(200);
 })
 
 app.post('/api/auth/logout', (req, res) => {
-    if (!req.user){
+    if (!req.user) {
         return res.status(401).json({message: "Unauthorized"});
     }
-    req.logout((err)=> {
+    req.logout((err) => {
         if (err) {
             return res.status(500).json({message: "Internal server error"});
         }
